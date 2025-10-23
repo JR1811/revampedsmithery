@@ -11,7 +11,7 @@
 		"homepage": "https://github.com/JR1811",
 		"sources": "https://github.com/JR1811/revampedsmithery"
 	},
-	"license": "MIT",
+	"license": "GPL-3.0 license",
 	"icon": "assets/revampedsmithery/icon.png",
 	"environment": "*",
 	"entrypoints": {
