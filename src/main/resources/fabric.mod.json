@@ -1,0 +1,37 @@
+{
+	"schemaVersion": 1,
+	"id": "revampedsmithery",
+	"version": "${version}",
+	"name": "RevampedSmithery",
+	"description": "A Fabric Minecraft Mod to revamp smithing by introducing more interactive processes",
+	"authors": [
+		"DEV - ShiroJR1811"
+	],
+	"contact": {
+		"homepage": "https://github.com/JR1811",
+		"sources": "https://github.com/JR1811/revampedsmithery"
+	},
+	"license": "MIT",
+	"icon": "assets/revampedsmithery/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"net.shirojr.revampedsmithery.RevampedSmithery"
+		],
+		"client": [
+			"net.shirojr.revampedsmithery.RevampedSmitheryClient"
+		],
+		"fabric-datagen": [
+			"net.shirojr.revampedsmithery.RevampedSmitheryDataGenerator"
+		]
+	},
+	"mixins": [
+		"revampedsmithery.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.17.3",
+		"minecraft": "~1.20.1",
+		"java": ">=17",
+		"fabric-api": "*"
+	}
+}
