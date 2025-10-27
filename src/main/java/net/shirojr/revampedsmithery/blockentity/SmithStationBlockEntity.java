@@ -4,6 +4,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Pair;
 import net.minecraft.util.StringIdentifiable;
@@ -14,6 +15,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.shirojr.revampedsmithery.RevampedSmithery;
 import net.shirojr.revampedsmithery.block.SmithStationBlock;
+import net.shirojr.revampedsmithery.compat.cca.custom.SmithStationDataComponent;
 import net.shirojr.revampedsmithery.init.RevampedSmitheryBlockEntities;
 import net.shirojr.revampedsmithery.init.RevampedSmitheryBlocks;
 import net.shirojr.revampedsmithery.util.ShapeUtil;
@@ -29,6 +31,14 @@ public class SmithStationBlockEntity extends BlockEntity {
     public SmithStationBlockEntity(BlockPos pos, BlockState state) {
         super(RevampedSmitheryBlockEntities.SMITH_STATION, pos, state);
         this.hitBoxes = new ArrayList<>(List.of(InteractionHitBox.values()));
+    }
+
+    public List<InteractionHitBox> getHitBoxes() {
+        return hitBoxes;
+    }
+
+    public SmithStationDataComponent getData() {
+        return SmithStationDataComponent.get(this);
     }
 
     public ActionResult attemptInteraction(ItemStack stack, PlayerEntity player, BlockHitResult hit) {
@@ -54,8 +64,24 @@ public class SmithStationBlockEntity extends BlockEntity {
         return closestInteraction.getLeft().interact(this, player, stack);
     }
 
-    public List<InteractionHitBox> getHitBoxes() {
-        return hitBoxes;
+    /**
+     * Keep Super call for {@link SmithStationDataComponent SmithStationDataComponent}!
+     *
+     * @apiNote <a href="https://ladysnake.org/wiki/cardinal-components-api/modules/block#usage">See Wiki</a>
+     */
+    @Override
+    public void readNbt(NbtCompound nbt) {
+        super.readNbt(nbt);
+    }
+
+    /**
+     * Keep Super call for {@link SmithStationDataComponent SmithStationDataComponent}!
+     *
+     * @apiNote <a href="https://ladysnake.org/wiki/cardinal-components-api/modules/block#usage">See Wiki</a>
+     */
+    @Override
+    protected void writeNbt(NbtCompound nbt) {
+        super.writeNbt(nbt);
     }
 
     public enum InteractionHitBox implements StringIdentifiable {
@@ -122,6 +148,7 @@ public class SmithStationBlockEntity extends BlockEntity {
                 new Vector3f(0.7f, 0.1f, 0.3f),
                 (blockEntity, player, stack) -> {
                     RevampedSmithery.LOGGER.info("Used Ball");
+                    RevampedSmithery.LOGGER.info(blockEntity.getData().getArmorStack().toString());
                     return ActionResult.SUCCESS;
                 }
         );

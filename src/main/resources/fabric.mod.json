@@ -23,6 +23,14 @@
 		],
 		"fabric-datagen": [
 			"net.shirojr.revampedsmithery.RevampedSmitheryDataGenerator"
+		],
+		"cardinal-components-block": [
+			"net.shirojr.revampedsmithery.compat.cca.RevampedSmitheryComponents"
+		]
+	},
+	"custom": {
+		"cardinal-components": [
+			"revampedsmithery:smith_station_data"
 		]
 	},
 	"mixins": [
@@ -32,6 +40,8 @@
 		"fabricloader": ">=0.17.3",
 		"minecraft": "~1.20.1",
 		"java": ">=17",
-		"fabric-api": "*"
+		"fabric-api": "*",
+		"cardinal-components-base": "^5.2.3",
+		"cardinal-components-block": "^5.2.3"
 	}
 }
