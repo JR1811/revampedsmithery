@@ -10,10 +10,12 @@ import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.RotationAxis;
 import net.shirojr.revampedsmithery.RevampedSmithery;
 import net.shirojr.revampedsmithery.block.SmithStationBlock;
 import net.shirojr.revampedsmithery.blockentity.SmithStationBlockEntity;
+import net.shirojr.revampedsmithery.init.RevampedSmitheryBlocks;
 import net.shirojr.revampedsmithery.init.RevampedSmitheryModelLayers;
 import org.joml.Vector3f;
 
@@ -26,6 +28,7 @@ public class SmithStationRenderer implements BlockEntityRenderer<SmithStationBlo
         this.model = new SmithStationModel(ctx.getLayerModelPart(RevampedSmitheryModelLayers.SMITHING_STATION));
     }
 
+    @SuppressWarnings("unused")
     public SmithStationModel getModel() {
         return model;
     }
@@ -52,9 +55,12 @@ public class SmithStationRenderer implements BlockEntityRenderer<SmithStationBlo
     }
 
     private void renderInteractionBoxes(SmithStationBlockEntity entity, MatrixStack matrices, VertexConsumerProvider vertexConsumers) {
+        BlockState state = entity.getCachedState();
+        if (!state.isOf(RevampedSmitheryBlocks.SMITH_STATION)) return;
+        Direction facing = state.get(SmithStationBlock.FACING);
         entity.getHitBoxes().forEach((hitBox) -> {
             Vector3f color = hitBox.getDebugColor();
-            WorldRenderer.drawBox(matrices, vertexConsumers.getBuffer(RenderLayer.LINES), hitBox.getBox(),
+            WorldRenderer.drawBox(matrices, vertexConsumers.getBuffer(RenderLayer.LINES), hitBox.getRotatedBox(facing),
                     color.x, color.y, color.z, 1f);
         });
     }

@@ -32,7 +32,7 @@ public class SmithStationModel extends Model {
     private final ModelPart grindingPlate;
 
     public SmithStationModel(ModelPart root) {
-        super(RenderLayer::getEntitySolid);
+        super(RenderLayer::getEntityCutout);
         this.root = root;
         this.body = root.getChild("body");
         this.table = this.body.getChild("table");
@@ -65,9 +65,9 @@ public class SmithStationModel extends Model {
 
         ModelPartData table = body.addChild("table", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 
-        ModelPartData tablePlate = table.addChild("tableplate", ModelPartBuilder.create().uv(0, 0).cuboid(-8.0F, -8.0F, -8.0F, 19.0F, 2.0F, 16.0F, new Dilation(0.0F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
+        ModelPartData tableplate = table.addChild("tableplate", ModelPartBuilder.create().uv(0, 0).cuboid(-8.0F, -8.0F, -8.0F, 19.0F, 2.0F, 16.0F, new Dilation(0.0F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 
-        ModelPartData tableLegs = table.addChild("tablelegs", ModelPartBuilder.create().uv(8, 81).cuboid(8.0F, -7.1F, -7.0F, 2.0F, 15.0F, 2.0F, new Dilation(0.0F))
+        ModelPartData tablelegs = table.addChild("tablelegs", ModelPartBuilder.create().uv(8, 81).cuboid(8.0F, -7.1F, -7.0F, 2.0F, 15.0F, 2.0F, new Dilation(0.0F))
                 .uv(48, 18).cuboid(-7.0F, -7.1F, -7.0F, 2.0F, 15.0F, 14.0F, new Dilation(0.0F))
                 .uv(70, 10).cuboid(-5.0F, 5.0F, 5.0F, 13.0F, 2.0F, 2.0F, new Dilation(0.0F))
                 .uv(70, 14).cuboid(-5.0F, 0.0F, 5.0F, 13.0F, 2.0F, 2.0F, new Dilation(0.0F))
@@ -82,25 +82,25 @@ public class SmithStationModel extends Model {
                 .uv(78, 47).cuboid(-8.0F, -6.0F, 4.0F, 4.0F, 14.0F, 4.0F, new Dilation(0.0F))
                 .uv(0, 81).cuboid(8.0F, -7.1F, 5.0F, 2.0F, 15.0F, 2.0F, new Dilation(0.0F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 
-        ModelPartData underTable = body.addChild("undertable", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
+        ModelPartData undertable = body.addChild("undertable", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 
-        ModelPartData waterbucket = underTable.addChild("waterbucket", ModelPartBuilder.create().uv(48, 83).cuboid(2.0F, 3.0F, 4.0F, 5.0F, 5.0F, 1.0F, new Dilation(0.0F))
+        ModelPartData waterbucket = undertable.addChild("waterbucket", ModelPartBuilder.create().uv(48, 83).cuboid(2.0F, 3.0F, 4.0F, 5.0F, 5.0F, 1.0F, new Dilation(0.0F))
                 .uv(34, 88).cuboid(2.0F, 3.0F, 0.0F, 5.0F, 5.0F, 1.0F, new Dilation(0.0F))
                 .uv(50, 89).cuboid(6.0F, 3.0F, 1.0F, 1.0F, 5.0F, 3.0F, new Dilation(0.0F))
                 .uv(58, 89).cuboid(2.0F, 3.0F, 1.0F, 1.0F, 5.0F, 3.0F, new Dilation(0.0F))
                 .uv(66, 89).cuboid(3.0F, 7.0F, 1.0F, 3.0F, 1.0F, 3.0F, new Dilation(0.0F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 
-        ModelPartData bellows = underTable.addChild("bellows", ModelPartBuilder.create().uv(30, 70).cuboid(-5.0F, 7.0F, -7.0F, 4.0F, 1.0F, 12.0F, new Dilation(0.0F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
+        ModelPartData bellows = undertable.addChild("bellows", ModelPartBuilder.create().uv(30, 70).cuboid(-5.0F, 7.0F, -7.0F, 4.0F, 1.0F, 12.0F, new Dilation(0.0F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 
-        ModelPartData bellowsTread = bellows.addChild("bellowstread", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
+        ModelPartData bellowstread = bellows.addChild("bellowstread", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 
-        ModelPartData cube_r1 = bellowsTread.addChild("cube_r1", ModelPartBuilder.create().uv(88, 75).cuboid(-2.0F, -1.0F, 0.0F, 2.0F, 1.0F, 4.0F, new Dilation(0.0F)), ModelTransform.of(-2.0F, 8.0F, -6.0F, 0.5672F, 0.0F, 0.0F));
+        ModelPartData cube_r1 = bellowstread.addChild("cube_r1", ModelPartBuilder.create().uv(88, 75).cuboid(-2.0F, -1.0F, 0.0F, 2.0F, 1.0F, 4.0F, new Dilation(0.0F)), ModelTransform.of(-2.0F, 8.0F, -6.0F, 0.5672F, 0.0F, 0.0F));
 
         ModelPartData chain = bellows.addChild("chain", ModelPartBuilder.create().uv(46, 89).cuboid(-4.0F, -7.0F, -3.0F, 2.0F, 13.0F, 0.0F, new Dilation(0.0F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 
-        ModelPartData overTable = body.addChild("overthetable", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
+        ModelPartData overthetable = body.addChild("overthetable", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 
-        ModelPartData Oven = overTable.addChild("Oven", ModelPartBuilder.create().uv(48, 47).cuboid(-7.0F, -18.0F, -7.0F, 2.0F, 10.0F, 13.0F, new Dilation(0.0F))
+        ModelPartData Oven = overthetable.addChild("Oven", ModelPartBuilder.create().uv(48, 47).cuboid(-7.0F, -18.0F, -7.0F, 2.0F, 10.0F, 13.0F, new Dilation(0.0F))
                 .uv(80, 18).cuboid(-5.0F, -18.0F, 5.0F, 10.0F, 10.0F, 1.0F, new Dilation(0.0F))
                 .uv(0, 54).cuboid(5.0F, -18.0F, -7.0F, 2.0F, 10.0F, 13.0F, new Dilation(0.0F))
                 .uv(78, 67).cuboid(-4.0F, -19.0F, 5.0F, 8.0F, 1.0F, 1.0F, new Dilation(0.0F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
@@ -109,18 +109,18 @@ public class SmithStationModel extends Model {
 
         ModelPartData cube_r3 = Oven.addChild("cube_r3", ModelPartBuilder.create().uv(0, 18).cuboid(-8.8F, -2.0F, 0.01F, 8.0F, 2.0F, 16.0F, new Dilation(0.0F)), ModelTransform.of(8.0F, -16.8F, -8.0F, 0.0F, 0.0F, 0.2618F));
 
-        ModelPartData coalPile = Oven.addChild("coalpile", ModelPartBuilder.create().uv(94, 48).cuboid(-5.0F, -10.0F, 3.0F, 2.0F, 2.0F, 2.0F, new Dilation(0.0F))
+        ModelPartData coalpile = Oven.addChild("coalpile", ModelPartBuilder.create().uv(94, 48).cuboid(-5.0F, -10.0F, 3.0F, 2.0F, 2.0F, 2.0F, new Dilation(0.0F))
                 .uv(94, 56).cuboid(-6.0F, -10.0F, 1.0F, 2.0F, 2.0F, 2.0F, new Dilation(0.0F))
                 .uv(78, 89).cuboid(3.0F, -10.0F, 2.0F, 2.0F, 2.0F, 3.0F, new Dilation(0.0F))
                 .uv(88, 89).cuboid(-3.0F, -9.0F, 2.0F, 2.0F, 2.0F, 3.0F, new Dilation(0.0F))
-                .uv(70, 0).cuboid(-4.0F, -8.0F, -5.0F, 8.0F, 0.0F, 10.0F, new Dilation(0.0F))
+                .uv(70, 0).cuboid(-4.0F, -8.01F, -5.0F, 8.0F, 0.0F, 10.0F, new Dilation(0.0F))
                 .uv(94, 52).cuboid(1.0F, -9.0F, 3.0F, 2.0F, 2.0F, 2.0F, new Dilation(0.0F))
                 .uv(88, 69).cuboid(4.0F, -9.0F, -1.0F, 2.0F, 2.0F, 4.0F, new Dilation(0.0F))
                 .uv(80, 41).cuboid(-6.0F, -9.0F, -1.0F, 3.0F, 2.0F, 4.0F, new Dilation(0.0F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 
-        ModelPartData coalStorage = Oven.addChild("coalstorage", ModelPartBuilder.create().uv(62, 70).cuboid(-5.0F, -6.0F, -2.9F, 5.0F, 3.0F, 8.0F, new Dilation(0.0F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
+        ModelPartData coalstorage = Oven.addChild("coalstorage", ModelPartBuilder.create().uv(62, 70).cuboid(-5.0F, -6.0F, -2.9F, 5.0F, 3.0F, 8.0F, new Dilation(0.0F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 
-        ModelPartData tools = overTable.addChild("tools", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
+        ModelPartData tools = overthetable.addChild("tools", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 
         ModelPartData rack = tools.addChild("rack", ModelPartBuilder.create().uv(78, 65).cuboid(-6.0F, -15.0F, 5.5F, 12.0F, 1.0F, 1.0F, new Dilation(0.0F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 
@@ -137,21 +137,21 @@ public class SmithStationModel extends Model {
         ModelPartData hammer = tools.addChild("hammer", ModelPartBuilder.create().uv(74, 93).cuboid(3.0F, -15.0F, 5.7F, 1.0F, 6.0F, 1.0F, new Dilation(0.0F))
                 .uv(94, 60).cuboid(2.0F, -16.0F, 6.0F, 3.0F, 1.0F, 1.0F, new Dilation(0.0F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 
-        ModelPartData raspFile = tools.addChild("raspfile", ModelPartBuilder.create().uv(42, 94).cuboid(-4.0F, -14.0F, 5.6F, 1.0F, 5.0F, 1.0F, new Dilation(0.0F))
+        ModelPartData raspfile = tools.addChild("raspfile", ModelPartBuilder.create().uv(42, 94).cuboid(-4.0F, -14.0F, 5.6F, 1.0F, 5.0F, 1.0F, new Dilation(0.0F))
                 .uv(82, 94).cuboid(-4.0F, -16.0F, 5.8F, 1.0F, 2.0F, 1.0F, new Dilation(0.0F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 
-        ModelPartData clamp = overTable.addChild("clamp", ModelPartBuilder.create().uv(34, 83).cuboid(8.0F, -9.0F, 0.0F, 4.0F, 2.0F, 3.0F, new Dilation(0.0F))
+        ModelPartData clamp = overthetable.addChild("clamp", ModelPartBuilder.create().uv(34, 83).cuboid(8.0F, -9.0F, 0.0F, 4.0F, 2.0F, 3.0F, new Dilation(0.0F))
                 .uv(94, 41).cuboid(11.0F, -11.0F, 0.0F, 1.0F, 2.0F, 3.0F, new Dilation(0.0F))
                 .uv(94, 46).cuboid(11.0F, -9.0F, 1.0F, 4.0F, 1.0F, 1.0F, new Dilation(0.0F))
                 .uv(66, 93).cuboid(13.0F, -10.0F, 0.0F, 1.0F, 3.0F, 3.0F, new Dilation(0.0F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 
-        ModelPartData closerClamp = clamp.addChild("closerclamp", ModelPartBuilder.create().uv(34, 94).cuboid(9.0F, -11.0F, 0.0F, 1.0F, 2.0F, 3.0F, new Dilation(0.0F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
+        ModelPartData closerclamp = clamp.addChild("closerclamp", ModelPartBuilder.create().uv(34, 94).cuboid(9.0F, -11.0F, 0.0F, 1.0F, 2.0F, 3.0F, new Dilation(0.0F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 
-        ModelPartData bulgingBall = overTable.addChild("bulgingball", ModelPartBuilder.create().uv(30, 54).cuboid(18.0F, -11.0F, 4.0F, 4.0F, 4.0F, 4.0F, new Dilation(0.0F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
+        ModelPartData bulgingball = overthetable.addChild("bulgingball", ModelPartBuilder.create().uv(30, 54).cuboid(18.0F, -11.0F, 4.0F, 4.0F, 4.0F, 4.0F, new Dilation(0.0F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 
-        ModelPartData grindingPlate = overTable.addChild("grindingplate", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
+        ModelPartData grindingplate = overthetable.addChild("grindingplate", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 
-        ModelPartData cube_r8 = grindingPlate.addChild("cube_r8", ModelPartBuilder.create().uv(24, 83).cuboid(-2.0F, -5.0F, 0.0F, 1.0F, 8.0F, 4.0F, new Dilation(0.0F)), ModelTransform.of(11.0F, -9.5F, -6.0F, 0.0F, 0.0F, -0.7854F));
+        ModelPartData cube_r8 = grindingplate.addChild("cube_r8", ModelPartBuilder.create().uv(24, 83).cuboid(-2.0F, -5.0F, 0.0F, 1.0F, 8.0F, 4.0F, new Dilation(0.0F)), ModelTransform.of(11.0F, -9.5F, -6.0F, 0.0F, 0.0F, -0.7854F));
         return TexturedModelData.of(modelData, 128, 128);
     }
 

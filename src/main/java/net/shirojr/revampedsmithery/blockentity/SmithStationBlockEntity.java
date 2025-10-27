@@ -10,9 +10,13 @@ import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.shirojr.revampedsmithery.RevampedSmithery;
+import net.shirojr.revampedsmithery.block.SmithStationBlock;
 import net.shirojr.revampedsmithery.init.RevampedSmitheryBlockEntities;
+import net.shirojr.revampedsmithery.init.RevampedSmitheryBlocks;
+import net.shirojr.revampedsmithery.util.ShapeUtil;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -30,13 +34,16 @@ public class SmithStationBlockEntity extends BlockEntity {
     public ActionResult attemptInteraction(ItemStack stack, PlayerEntity player, BlockHitResult hit) {
         Vec3d eyePos = player.getEyePos();
         Vec3d hitPos = hit.getPos();
+        BlockState state = this.getCachedState();
+        if (!state.isOf(RevampedSmitheryBlocks.SMITH_STATION)) return ActionResult.FAIL;
+        Direction facing = state.get(SmithStationBlock.FACING);
 
         Pair<InteractionHitBox, Double> closestInteraction = null;
         double reachDistance = player.isCreative() ? 5.0 : 4.5;
         Vec3d fullRangeReach = hitPos.subtract(eyePos).normalize().multiply(reachDistance);
         Vec3d endPos = eyePos.add(fullRangeReach);
         for (InteractionHitBox hitBox : this.getHitBoxes()) {
-            Optional<Vec3d> raycast = hitBox.getBox().offset(this.pos).raycast(eyePos, endPos);
+            Optional<Vec3d> raycast = hitBox.getRotatedBox(facing).offset(this.pos).raycast(eyePos, endPos);
             if (raycast.isEmpty()) continue;
             double currentDistance = eyePos.squaredDistanceTo(raycast.get());
             if (closestInteraction == null || closestInteraction.getRight() > currentDistance) {
@@ -53,28 +60,71 @@ public class SmithStationBlockEntity extends BlockEntity {
 
     public enum InteractionHitBox implements StringIdentifiable {
         BUCKET(
-                getBoxFromPixelCoordinates(
+                ShapeUtil.getBoxFromVoxelCoordinates(
                         new Vec3d(10, 0, 3),
                         new Vec3d(15, 5, 8)
                 ),
-                new Vector3f(7f, 1f, 3f),
+                new Vector3f(0.7f, 0.1f, 0.3f),
                 (blockEntity, player, stack) -> {
                     RevampedSmithery.LOGGER.info("Used Bucket");
                     return ActionResult.SUCCESS;
                 }
         ),
         PEDAL(
-                new Box(1, 1, 1, 2, 2, 2),
-                new Vector3f(2f, 2f, 2f),
+                ShapeUtil.getBoxFromVoxelCoordinates(
+                        new Vec3d(3, 0, 3),
+                        new Vec3d(7, 5, 15)
+                ),
+                new Vector3f(0.7f, 0.1f, 0.3f),
                 (blockEntity, player, stack) -> {
                     RevampedSmithery.LOGGER.info("Used Pedal");
                     return ActionResult.SUCCESS;
                 }
         ),
-        /*COAL(new Box(1, 1, 1, 2, 2, 2), new Vector3f(2f, 2f, 2f)),
-        CLAMP(new Box(1, 1, 1, 2, 2, 2), new Vector3f(2f, 2f, 2f)),
-        RASP_FILE(new Box(1, 1, 1, 2, 2, 2), new Vector3f(2f, 2f, 2f)),
-        BALL(new Box(1, 1, 1, 2, 2, 2), new Vector3f(2f, 2f, 2f)),*/;
+        COAL(
+                ShapeUtil.getBoxFromVoxelCoordinates(
+                        new Vec3d(3, 16, 3),
+                        new Vec3d(13, 27, 15)
+                ),
+                new Vector3f(0.7f, 0.1f, 0.3f),
+                (blockEntity, player, stack) -> {
+                    RevampedSmithery.LOGGER.info("Used Coal Furnace");
+                    return ActionResult.SUCCESS;
+                }
+        ),
+        RASP_FILE(
+                ShapeUtil.getBoxFromVoxelCoordinates(
+                        new Vec3d(15, 14, 10),
+                        new Vec3d(21, 20, 14)
+                ),
+                new Vector3f(0.7f, 0.1f, 0.3f),
+                (blockEntity, player, stack) -> {
+                    RevampedSmithery.LOGGER.info("Used rasp file");
+                    return ActionResult.SUCCESS;
+                }
+        ),
+        CLAMP(
+                ShapeUtil.getBoxFromVoxelCoordinates(
+                        new Vec3d(15, 15, 5),
+                        new Vec3d(23, 19, 8)
+                ),
+                new Vector3f(0.7f, 0.1f, 0.3f),
+                (blockEntity, player, stack) -> {
+                    RevampedSmithery.LOGGER.info("Used Clamp");
+                    return ActionResult.SUCCESS;
+                }
+        ),
+        BALL(
+                ShapeUtil.getBoxFromVoxelCoordinates(
+                        new Vec3d(26, 15, 0),
+                        new Vec3d(30, 19, 4)
+                ),
+                new Vector3f(0.7f, 0.1f, 0.3f),
+                (blockEntity, player, stack) -> {
+                    RevampedSmithery.LOGGER.info("Used Ball");
+                    return ActionResult.SUCCESS;
+                }
+        );
 
         private final Box box;
         private final Vector3f debugColor;
@@ -86,27 +136,28 @@ public class SmithStationBlockEntity extends BlockEntity {
             this.interaction = interaction;
         }
 
-        public Box getBox() {
+        /**
+         * Default Boxes are only aligned towards {@link Direction#NORTH}
+         */
+        public Box getDefaultBox() {
             return box;
+        }
+
+        public Box getRotatedBox(Direction facing) {
+            return ShapeUtil.rotateBox(getDefaultBox(), facing);
         }
 
         public Vector3f getDebugColor() {
             return debugColor;
         }
 
-        @Override
-        public String asString() {
-            return this.name();
-        }
-
         public ActionResult interact(SmithStationBlockEntity blockEntity, PlayerEntity player, ItemStack stack) {
             return this.interaction.execute(blockEntity, player, stack);
         }
 
-        public static Box getBoxFromPixelCoordinates(Vec3d start, Vec3d end) {
-            Vec3d localSpaceStart = new Vec3d(start.x / 16, start.y / 16, start.z / 16);
-            Vec3d localSpaceEnd = new Vec3d(end.x / 16, end.y / 16, end.z / 16);
-            return new Box(localSpaceStart, localSpaceEnd);
+        @Override
+        public String asString() {
+            return this.name();
         }
     }
 
