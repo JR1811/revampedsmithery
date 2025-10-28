@@ -3,8 +3,12 @@ package net.shirojr.revampedsmithery.blockentity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Pair;
 import net.minecraft.util.StringIdentifiable;
@@ -148,7 +152,28 @@ public class SmithStationBlockEntity extends BlockEntity {
                 new Vector3f(0.7f, 0.1f, 0.3f),
                 (blockEntity, player, stack) -> {
                     RevampedSmithery.LOGGER.info("Used Ball");
-                    RevampedSmithery.LOGGER.info(blockEntity.getData().getArmorStack().toString());
+                    boolean isServer = player.getWorld() instanceof ServerWorld;
+                    ItemStack handStack = player.getMainHandStack();
+                    SmithStationDataComponent data = blockEntity.getData();
+                    if (handStack.getItem() instanceof ArmorItem && data.isArmorStackEmpty()) {
+                        if (isServer) {
+                            data.setArmorStack(handStack.copy());
+                            if (!player.isCreative()) {
+                                player.getMainHandStack().setCount(0);
+                            }
+                        }
+                    } else if (handStack.isEmpty() && !data.isArmorStackEmpty()) {
+                        if (isServer) {
+                            player.getInventory().offerOrDrop(data.getArmorStack().copy());
+                            data.setArmorStack(ItemStack.EMPTY);
+                        }
+                    } else {
+                        return ActionResult.PASS;
+                    }
+                    if (player.getWorld() instanceof ServerWorld serverWorld) {
+                        serverWorld.playSound(null, blockEntity.getPos(), SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, SoundCategory.BLOCKS, 1f, 1f);
+                    }
+                    RevampedSmithery.LOGGER.info(data.getArmorStack().toString());
                     return ActionResult.SUCCESS;
                 }
         );

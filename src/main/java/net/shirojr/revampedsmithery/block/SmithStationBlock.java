@@ -91,6 +91,7 @@ public class SmithStationBlock extends BlockWithEntity {
     @Override
     public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
         return checkType(type, RevampedSmitheryBlockEntities.SMITH_STATION, (world1, pos, state1, blockEntity) -> {
+            // ticking is done by CCA component
         });
     }
 

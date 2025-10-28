@@ -17,6 +17,7 @@ import net.shirojr.revampedsmithery.block.SmithStationBlock;
 import net.shirojr.revampedsmithery.blockentity.SmithStationBlockEntity;
 import net.shirojr.revampedsmithery.init.RevampedSmitheryBlocks;
 import net.shirojr.revampedsmithery.init.RevampedSmitheryModelLayers;
+import net.shirojr.revampedsmithery.mixin.access.DebugRendererAccess;
 import org.joml.Vector3f;
 
 public class SmithStationRenderer implements BlockEntityRenderer<SmithStationBlockEntity> {
@@ -37,12 +38,14 @@ public class SmithStationRenderer implements BlockEntityRenderer<SmithStationBlo
     public void render(SmithStationBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client == null || client.world == null) return;
+        if (((DebugRendererAccess) client.debugRenderer).showChunkBorder()) {
+            renderInteractionBoxes(entity, matrices, vertexConsumers);
+        }
 
         BlockState state = entity.getCachedState();
         int blockLight = WorldRenderer.getLightmapCoordinates(client.world, entity.getPos().up(2));
 
         matrices.push();
-        renderInteractionBoxes(entity, matrices, vertexConsumers);
 
         matrices.translate(0.5, 1.5, 0.5);
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(180));

@@ -57,6 +57,10 @@ public class SmithStationDataComponent implements Component, AutoSyncedComponent
         this.sync();
     }
 
+    public boolean isFuelStackEmpty() {
+        return getFuelStack().isEmpty();
+    }
+
     public @NotNull ItemStack getArmorStack() {
         return armorStack;
     }
@@ -64,6 +68,10 @@ public class SmithStationDataComponent implements Component, AutoSyncedComponent
     public void setArmorStack(@NotNull ItemStack armorStack) {
         this.armorStack = armorStack;
         this.sync();
+    }
+
+    public boolean isArmorStackEmpty() {
+        return getArmorStack().isEmpty();
     }
 
     public long getWaterLevel() {
@@ -86,7 +94,7 @@ public class SmithStationDataComponent implements Component, AutoSyncedComponent
 
     @Override
     public void tick() {
-        RevampedSmithery.LOGGER.info("Ticked SmithStation data component");
+        // RevampedSmithery.LOGGER.info("Ticked SmithStation data component");
     }
 
     @Override
@@ -99,27 +107,20 @@ public class SmithStationDataComponent implements Component, AutoSyncedComponent
 
     @Override
     public void writeToNbt(NbtCompound nbtCompound) {
-        if (this.getFuelStack().isEmpty()) {
-            nbtCompound.remove("fuel");
-        } else {
-            NbtCompound fuelNbt = new NbtCompound();
-            this.getFuelStack().writeNbt(fuelNbt);
-            nbtCompound.put("fuel", fuelNbt);
-        }
+        NbtCompound fuelNbt = new NbtCompound();
+        this.getFuelStack().writeNbt(fuelNbt);
+        nbtCompound.put("fuel", fuelNbt);
 
-        if (this.getArmorStack().isEmpty()) {
-            nbtCompound.remove("armor");
-        } else {
-            NbtCompound armorNbt = new NbtCompound();
-            this.getArmorStack().writeNbt(armorNbt);
-            nbtCompound.put("armor", armorNbt);
-        }
+        NbtCompound armorNbt = new NbtCompound();
+        this.getArmorStack().writeNbt(armorNbt);
+        nbtCompound.put("armor", armorNbt);
 
         nbtCompound.putLong("water", this.getWaterLevel());
         nbtCompound.putFloat("heat", this.getNormalizedHeat());
     }
 
     private void sync() {
+        blockEntity.markDirty();
         RevampedSmitheryComponents.SMITHING_STATION_DATA.sync(blockEntity);
     }
 }
