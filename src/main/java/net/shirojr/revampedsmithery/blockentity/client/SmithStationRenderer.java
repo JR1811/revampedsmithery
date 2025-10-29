@@ -59,6 +59,8 @@ public class SmithStationRenderer implements BlockEntityRenderer<SmithStationBlo
         ItemStack armorStack = entity.getData().getArmorStack();
         int blockLight = WorldRenderer.getLightmapCoordinates(client.world, entity.getPos().up(2));
 
+        this.baseModel.getCoalModel().visible = !entity.getData().isFuelStackEmpty();
+
         matrices.push();
 
         matrices.translate(0.5, 1.5, 0.5);

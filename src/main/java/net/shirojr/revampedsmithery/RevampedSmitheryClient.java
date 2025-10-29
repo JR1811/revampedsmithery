@@ -2,6 +2,7 @@ package net.shirojr.revampedsmithery;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.shirojr.revampedsmithery.init.RevampedSmitheryBlockEntityRenderers;
+import net.shirojr.revampedsmithery.init.RevampedSmitheryEvents;
 import net.shirojr.revampedsmithery.init.RevampedSmitheryModelLayers;
 
 public class RevampedSmitheryClient implements ClientModInitializer {
@@ -9,5 +10,6 @@ public class RevampedSmitheryClient implements ClientModInitializer {
     public void onInitializeClient() {
         RevampedSmitheryModelLayers.initialize();
         RevampedSmitheryBlockEntityRenderers.initialize();
+        RevampedSmitheryEvents.initializeClient();
     }
 }

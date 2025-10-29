@@ -1,8 +1,11 @@
 package net.shirojr.revampedsmithery.util;
 
+import net.minecraft.block.Block;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
 
 public class ShapeUtil {
     /**
@@ -46,5 +49,27 @@ public class ShapeUtil {
         Vec3d start = rotatePoint(new Vec3d(box.minX, box.minY, box.minZ), facing);
         Vec3d end = rotatePoint(new Vec3d(box.maxX, box.maxY, box.maxZ), facing);
         return new Box(start, end);
+    }
+
+    public static VoxelShape createRotatedShape(Box box, Direction direction) {
+        return switch (direction) {
+            case NORTH -> Block.createCuboidShape(
+                    box.minX, box.minY, box.minZ,
+                    box.maxX, box.maxY, box.maxZ
+            );
+            case SOUTH -> Block.createCuboidShape(
+                    16 - box.maxX, box.minY, 16 - box.maxZ,
+                    16 - box.minX, box.maxY, 16 - box.minZ
+            );
+            case WEST -> Block.createCuboidShape(
+                    box.minZ, box.minY, 16 - box.maxX,
+                    box.maxZ, box.maxY, 16 - box.minX
+            );
+            case EAST -> Block.createCuboidShape(
+                    16 - box.maxZ, box.minY, box.minX,
+                    16 - box.minZ, box.maxY, box.maxX
+            );
+            default -> VoxelShapes.fullCube();
+        };
     }
 }

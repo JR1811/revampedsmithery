@@ -155,6 +155,18 @@ public class SmithStationModel extends Model {
         return TexturedModelData.of(modelData, 128, 128);
     }
 
+    public ModelPart getCoalModel() {
+        return this.coalPile;
+    }
+
+    public ModelPart getPedal() {
+        return this.bellowsTread;
+    }
+
+    public ModelPart getPedalChain() {
+        return this.chain;
+    }
+
 
     @Override
     public void render(MatrixStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {

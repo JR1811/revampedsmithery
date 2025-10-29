@@ -1,6 +1,7 @@
 package net.shirojr.revampedsmithery.blockentity;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ArmorItem;
@@ -13,16 +14,14 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Pair;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.shirojr.revampedsmithery.RevampedSmithery;
 import net.shirojr.revampedsmithery.block.SmithStationBlock;
 import net.shirojr.revampedsmithery.compat.cca.custom.SmithStationDataComponent;
 import net.shirojr.revampedsmithery.init.RevampedSmitheryBlockEntities;
 import net.shirojr.revampedsmithery.init.RevampedSmitheryBlocks;
 import net.shirojr.revampedsmithery.util.ShapeUtil;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -46,16 +45,23 @@ public class SmithStationBlockEntity extends BlockEntity {
     }
 
     public ActionResult attemptInteraction(ItemStack stack, PlayerEntity player, BlockHitResult hit) {
-        Vec3d eyePos = player.getEyePos();
-        Vec3d hitPos = hit.getPos();
         BlockState state = this.getCachedState();
         if (!state.isOf(RevampedSmitheryBlocks.SMITH_STATION)) return ActionResult.FAIL;
-        Direction facing = state.get(SmithStationBlock.FACING);
+        InteractionHitBox targetedHitbox = getTargetedHitbox(player);
+        if (targetedHitbox == null) return ActionResult.PASS;
+        return targetedHitbox.interact(this, hit.getBlockPos(), player, stack, false);
+    }
 
+    @Nullable
+    public InteractionHitBox getTargetedHitbox(PlayerEntity player) {
         Pair<InteractionHitBox, Double> closestInteraction = null;
+
         double reachDistance = player.isCreative() ? 5.0 : 4.5;
-        Vec3d fullRangeReach = hitPos.subtract(eyePos).normalize().multiply(reachDistance);
+        Vec3d eyePos = player.getEyePos();
+        Vec3d fullRangeReach = player.getRotationVector().multiply(reachDistance);
         Vec3d endPos = eyePos.add(fullRangeReach);
+        Direction facing = this.getCachedState().get(SmithStationBlock.FACING);
+
         for (InteractionHitBox hitBox : this.getHitBoxes()) {
             Optional<Vec3d> raycast = hitBox.getRotatedBox(facing).offset(this.pos).raycast(eyePos, endPos);
             if (raycast.isEmpty()) continue;
@@ -64,8 +70,7 @@ public class SmithStationBlockEntity extends BlockEntity {
                 closestInteraction = new Pair<>(hitBox, currentDistance);
             }
         }
-        if (closestInteraction == null) return ActionResult.PASS;
-        return closestInteraction.getLeft().interact(this, player, stack);
+        return closestInteraction == null ? null : closestInteraction.getLeft();
     }
 
     /**
@@ -95,7 +100,7 @@ public class SmithStationBlockEntity extends BlockEntity {
                         new Vec3d(15, 5, 8)
                 ),
                 new Vector3f(0.7f, 0.1f, 0.3f),
-                (blockEntity, player, stack) -> {
+                (blockEntity, actualPos, player, stack, isAttack) -> {
                     RevampedSmithery.LOGGER.info("Used Bucket");
                     return ActionResult.SUCCESS;
                 }
@@ -106,7 +111,7 @@ public class SmithStationBlockEntity extends BlockEntity {
                         new Vec3d(7, 5, 15)
                 ),
                 new Vector3f(0.7f, 0.1f, 0.3f),
-                (blockEntity, player, stack) -> {
+                (blockEntity, actualPos, player, stack, isAttack) -> {
                     RevampedSmithery.LOGGER.info("Used Pedal");
                     return ActionResult.SUCCESS;
                 }
@@ -117,9 +122,21 @@ public class SmithStationBlockEntity extends BlockEntity {
                         new Vec3d(13, 27, 15)
                 ),
                 new Vector3f(0.7f, 0.1f, 0.3f),
-                (blockEntity, player, stack) -> {
+                (blockEntity, actualPos, player, stack, isAttack) -> {
                     RevampedSmithery.LOGGER.info("Used Coal Furnace");
-                    return ActionResult.SUCCESS;
+                    ItemStack furnaceStack = blockEntity.getData().getFuelStack();
+                    int insertionAmount = 1;
+                    ItemStack toBeInsertedStack = stack.copyWithCount(insertionAmount);
+                    boolean canMerge = furnaceStack.isEmpty() || (ItemStack.canCombine(toBeInsertedStack, furnaceStack) && toBeInsertedStack.getCount() + furnaceStack.getCount() <= toBeInsertedStack.getMaxCount());
+                    if (AbstractFurnaceBlockEntity.canUseAsFuel(stack) && canMerge) {
+                        if (furnaceStack.isEmpty()) {
+                            blockEntity.getData().setFuelStack(toBeInsertedStack);
+                        } else {
+                            furnaceStack.increment(insertionAmount);
+                        }
+                        return ActionResult.SUCCESS;
+                    }
+                    return ActionResult.PASS;
                 }
         ),
         RASP_FILE(
@@ -128,7 +145,7 @@ public class SmithStationBlockEntity extends BlockEntity {
                         new Vec3d(21, 20, 14)
                 ),
                 new Vector3f(0.7f, 0.1f, 0.3f),
-                (blockEntity, player, stack) -> {
+                (blockEntity, actualPos, player, stack, isAttack) -> {
                     RevampedSmithery.LOGGER.info("Used rasp file");
                     return ActionResult.SUCCESS;
                 }
@@ -139,7 +156,7 @@ public class SmithStationBlockEntity extends BlockEntity {
                         new Vec3d(23, 19, 8)
                 ),
                 new Vector3f(0.7f, 0.1f, 0.3f),
-                (blockEntity, player, stack) -> {
+                (blockEntity, actualPos, player, stack, isAttack) -> {
                     RevampedSmithery.LOGGER.info("Used Clamp");
                     return ActionResult.SUCCESS;
                 }
@@ -150,11 +167,24 @@ public class SmithStationBlockEntity extends BlockEntity {
                         new Vec3d(30, 19, 4)
                 ),
                 new Vector3f(0.7f, 0.1f, 0.3f),
-                (blockEntity, player, stack) -> {
+                (blockEntity, actualPos, player, stack, isAttack) -> {
                     RevampedSmithery.LOGGER.info("Used Ball");
                     boolean isServer = player.getWorld() instanceof ServerWorld;
-                    ItemStack handStack = player.getMainHandStack();
                     SmithStationDataComponent data = blockEntity.getData();
+                    ItemStack handStack = player.getMainHandStack();
+                    ItemStack armorStack = data.getArmorStack();
+                    if (isAttack) {
+                        if (data.isArmorStackEmpty()) return ActionResult.PASS;
+                        if (isServer) {
+                            armorStack.setDamage(armorStack.getDamage() - 1);
+                            if (player.getWorld() instanceof ServerWorld serverWorld) {
+                                float pitch = MathHelper.lerp(serverWorld.getRandom().nextFloat(), 0.7f, 1f);
+                                serverWorld.playSound(null, actualPos, SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.BLOCKS, 1f, pitch);
+                                serverWorld.playSound(null, actualPos, SoundEvents.BLOCK_LANTERN_BREAK, SoundCategory.BLOCKS, 1f, pitch);
+                            }
+                        }
+                        return ActionResult.SUCCESS;
+                    }
                     if (handStack.getItem() instanceof ArmorItem && data.isArmorStackEmpty()) {
                         if (isServer) {
                             data.setArmorStack(handStack.copy());
@@ -164,16 +194,17 @@ public class SmithStationBlockEntity extends BlockEntity {
                         }
                     } else if (handStack.isEmpty() && !data.isArmorStackEmpty()) {
                         if (isServer) {
-                            player.getInventory().offerOrDrop(data.getArmorStack().copy());
+                            player.getInventory().offerOrDrop(armorStack.copy());
                             data.setArmorStack(ItemStack.EMPTY);
                         }
                     } else {
                         return ActionResult.PASS;
                     }
                     if (player.getWorld() instanceof ServerWorld serverWorld) {
-                        serverWorld.playSound(null, blockEntity.getPos(), SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, SoundCategory.BLOCKS, 1f, 1f);
+                        float pitch = MathHelper.lerp(serverWorld.getRandom().nextFloat(), 0.7f, 0.8f);
+                        serverWorld.playSound(null, actualPos, SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, SoundCategory.BLOCKS, 1f, pitch);
                     }
-                    RevampedSmithery.LOGGER.info(data.getArmorStack().toString());
+                    RevampedSmithery.LOGGER.info(armorStack.toString());
                     return ActionResult.SUCCESS;
                 }
         );
@@ -203,8 +234,8 @@ public class SmithStationBlockEntity extends BlockEntity {
             return debugColor;
         }
 
-        public ActionResult interact(SmithStationBlockEntity blockEntity, PlayerEntity player, ItemStack stack) {
-            return this.interaction.execute(blockEntity, player, stack);
+        public ActionResult interact(SmithStationBlockEntity blockEntity, BlockPos actualPos, PlayerEntity player, ItemStack stack, boolean isAttack) {
+            return this.interaction.execute(blockEntity, actualPos, player, stack, isAttack);
         }
 
         @Override
@@ -215,6 +246,6 @@ public class SmithStationBlockEntity extends BlockEntity {
 
     @FunctionalInterface
     public interface HitInteraction {
-        ActionResult execute(SmithStationBlockEntity blockEntity, PlayerEntity player, ItemStack stack);
+        ActionResult execute(SmithStationBlockEntity blockEntity, BlockPos actualPos, PlayerEntity player, ItemStack stack, boolean isAttack);
     }
 }

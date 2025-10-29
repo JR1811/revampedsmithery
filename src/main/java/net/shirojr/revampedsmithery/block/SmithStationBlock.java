@@ -19,6 +19,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.shape.VoxelShape;
@@ -30,6 +31,7 @@ import net.minecraft.world.WorldView;
 import net.shirojr.revampedsmithery.blockentity.SmithStationBlockEntity;
 import net.shirojr.revampedsmithery.init.RevampedSmitheryBlockEntities;
 import net.shirojr.revampedsmithery.init.RevampedSmitheryBlocks;
+import net.shirojr.revampedsmithery.util.ShapeUtil;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -57,7 +59,7 @@ public class SmithStationBlock extends BlockWithEntity {
         return new SmithStationBlockEntity(pos, state);
     }
 
-    public @Nullable SmithStationBlockEntity getBlockEntity(BlockView world, BlockPos pos) {
+    public static @Nullable SmithStationBlockEntity getBlockEntity(BlockView world, BlockPos pos) {
         if (world.getBlockEntity(pos) instanceof SmithStationBlockEntity blockEntity) return blockEntity;
         BlockState state = world.getBlockState(pos);
         if (!state.contains(PART) || !state.contains(FACING)) return null;
@@ -85,7 +87,19 @@ public class SmithStationBlock extends BlockWithEntity {
 
     @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-        return VoxelShapes.fullCube();
+        Direction facing = state.get(FACING);
+        return switch (state.get(PART)) {
+            case CLAMPS -> VoxelShapes.union(
+                    ShapeUtil.createRotatedShape(new Box(0, 0, 0, 7, 4, 16), facing),
+                    ShapeUtil.createRotatedShape(new Box(0, 0, 0, 14, 4, 4), facing)
+            );
+            case FENCES -> VoxelShapes.union(
+                    ShapeUtil.createRotatedShape(new Box(0, 0, 0, 3, 16, 16), facing),
+                    ShapeUtil.createRotatedShape(new Box(0, 0, 0, 14, 16, 4), facing)
+            );
+            case FURNACE -> createCuboidShape(0, 0, 0, 16, 13, 16);
+            default -> VoxelShapes.fullCube();
+        };
     }
 
     @Override
@@ -219,14 +233,14 @@ public class SmithStationBlock extends BlockWithEntity {
             return this.name().toLowerCase(Locale.ROOT);
         }
 
-        BlockPos getPosOfOrigin(BlockPos pos, Direction direction) {
+        public BlockPos getPosOfOrigin(BlockPos pos, Direction direction) {
             if (direction.getAxis().isVertical()) {
                 throw new UnsupportedOperationException("Smith Station block only supports horizontal directions");
             }
             return this.originPos.apply(pos, direction);
         }
 
-        BlockPos getPosFromOrigin(BlockPos originPos, Direction direction) {
+        public BlockPos getPosFromOrigin(BlockPos originPos, Direction direction) {
             if (direction.getAxis().isVertical()) {
                 throw new UnsupportedOperationException("Smith Station block only supports horizontal directions");
             }
