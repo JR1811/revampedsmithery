@@ -31,22 +31,20 @@ public class SmithStationRenderer implements BlockEntityRenderer<SmithStationBlo
     public static final Identifier TEXTURE = RevampedSmithery.getId("textures/entity/smith_station.png");
     private static final Map<String, Identifier> ARMOR_TEXTURE_CACHE = Maps.newHashMap();
 
-    private final SmithStationModel model;
-    // private final BipedEntityModel<LivingEntity> bipedModel;
-    private final ArmorStandArmorEntityModel innerModel;
-    private final ArmorStandArmorEntityModel outerModel;
+    private final SmithStationModel baseModel;
+    private final ArmorStandArmorEntityModel innerArmorModel;
+    private final ArmorStandArmorEntityModel outerArmorModel;
 
     public SmithStationRenderer(BlockEntityRendererFactory.Context ctx) {
-        this.model = new SmithStationModel(ctx.getLayerModelPart(RevampedSmitheryModelLayers.SMITHING_STATION));
-        //this.bipedModel = new BipedEntityModel<>(ctx.getLayerModelPart(EntityModelLayers.PLAYER));
+        this.baseModel = new SmithStationModel(ctx.getLayerModelPart(RevampedSmitheryModelLayers.SMITHING_STATION));
 
-        innerModel = new ArmorStandArmorEntityModel(ctx.getLayerModelPart(EntityModelLayers.ARMOR_STAND_INNER_ARMOR));
-        outerModel = new ArmorStandArmorEntityModel(ctx.getLayerModelPart(EntityModelLayers.ARMOR_STAND_OUTER_ARMOR));
+        this.innerArmorModel = new ArmorStandArmorEntityModel(ctx.getLayerModelPart(EntityModelLayers.ARMOR_STAND_INNER_ARMOR));
+        this.outerArmorModel = new ArmorStandArmorEntityModel(ctx.getLayerModelPart(EntityModelLayers.ARMOR_STAND_OUTER_ARMOR));
     }
 
     @SuppressWarnings("unused")
-    public SmithStationModel getModel() {
-        return model;
+    public SmithStationModel getBaseModel() {
+        return baseModel;
     }
 
     @Override
@@ -64,18 +62,16 @@ public class SmithStationRenderer implements BlockEntityRenderer<SmithStationBlo
         matrices.push();
 
         matrices.translate(0.5, 1.5, 0.5);
+
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(180));
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180));
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(state.get(SmithStationBlock.FACING).asRotation()));
 
-        VertexConsumer vertexConsumer = vertexConsumers.getBuffer(this.model.getLayer(TEXTURE));
-        this.model.render(matrices, vertexConsumer, blockLight, overlay, 1f, 1f, 1f, 1f);
+        VertexConsumer vertexConsumer = vertexConsumers.getBuffer(this.baseModel.getLayer(TEXTURE));
+        this.baseModel.render(matrices, vertexConsumer, blockLight, overlay, 1f, 1f, 1f, 1f);
 
         if (armorStack.getItem() instanceof ArmorItem armorItem) {
-            matrices.push();
-            matrices.translate(0, -2, 0);
-            renderArmor(matrices, vertexConsumers, blockLight, armorStack, armorItem, armorItem.getSlotType());
-            matrices.pop();
+            this.renderArmor(matrices, vertexConsumers, blockLight, armorStack, armorItem, armorItem.getSlotType());
         }
         matrices.pop();
     }
@@ -94,28 +90,53 @@ public class SmithStationRenderer implements BlockEntityRenderer<SmithStationBlo
     private void renderArmor(MatrixStack matrices, VertexConsumerProvider vertexConsumers,
                              int light, ItemStack stack, ArmorItem armorItem,
                              EquipmentSlot slot) {
+        float scale = 0.85f;
         boolean useInnerLayer = slot == EquipmentSlot.LEGS;
-        ArmorStandArmorEntityModel armorModel = useInnerLayer ? innerModel : outerModel;
+        ArmorStandArmorEntityModel armorModel = useInnerLayer ? innerArmorModel : outerArmorModel;
+
+        matrices.push();
 
         armorModel.setVisible(false);
+        armorModel.child = false;
+        armorModel.sneaking = false;
 
         switch (slot) {
-            case HEAD -> armorModel.head.visible = true;
+            case HEAD -> {
+                matrices.translate(1.25, 0.6, 0.375);
+                armorModel.head.visible = true;
+            }
             case CHEST -> {
+                matrices.translate(1.25, 0.2, 0.375);
                 armorModel.body.visible = true;
+
+                float modelSplit = 7f;
+                armorModel.leftArm.pivotX = modelSplit;
+                armorModel.rightArm.pivotX = -modelSplit;
+
                 armorModel.leftArm.visible = true;
                 armorModel.rightArm.visible = true;
             }
             case LEGS -> {
+                matrices.translate(1.25, -0.2, 0.375);
+                float modelSplit = 2.5f;
+                armorModel.leftLeg.pivotX = modelSplit;
+                armorModel.rightLeg.pivotX = -modelSplit;
+
                 armorModel.body.visible = true;
                 armorModel.leftLeg.visible = true;
                 armorModel.rightLeg.visible = true;
             }
             case FEET -> {
+                matrices.translate(1.25, -0.7, 0.375);
+                float modelSplit = 3f;
+                armorModel.leftLeg.pivotX = modelSplit;
+                armorModel.rightLeg.pivotX = -modelSplit;
                 armorModel.leftLeg.visible = true;
                 armorModel.rightLeg.visible = true;
             }
         }
+
+        matrices.scale(scale, scale, scale);
 
         if (armorItem instanceof DyeableArmorItem dyeableArmorItem) {
             int i = dyeableArmorItem.getColor(stack);
@@ -127,6 +148,7 @@ public class SmithStationRenderer implements BlockEntityRenderer<SmithStationBlo
         } else {
             this.renderArmorParts(matrices, vertexConsumers, light, armorItem, armorModel, useInnerLayer, 1.0F, 1.0F, 1.0F, null);
         }
+        matrices.pop();
     }
 
     private void renderArmorParts(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, ArmorItem item,

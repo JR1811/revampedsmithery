@@ -57,7 +57,7 @@ public class SmithStationBlock extends BlockWithEntity {
         return new SmithStationBlockEntity(pos, state);
     }
 
-    public @Nullable SmithStationBlockEntity getBlockEntity(WorldView world, BlockPos pos) {
+    public @Nullable SmithStationBlockEntity getBlockEntity(BlockView world, BlockPos pos) {
         if (world.getBlockEntity(pos) instanceof SmithStationBlockEntity blockEntity) return blockEntity;
         BlockState state = world.getBlockState(pos);
         if (!state.contains(PART) || !state.contains(FACING)) return null;
@@ -81,6 +81,11 @@ public class SmithStationBlock extends BlockWithEntity {
     public long getRenderingSeed(BlockState state, BlockPos pos) {
         BlockPos originPos = state.get(PART).getPosOfOrigin(pos, state.get(FACING));
         return MathHelper.hashCode(originPos);
+    }
+
+    @Override
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return VoxelShapes.fullCube();
     }
 
     @Override
