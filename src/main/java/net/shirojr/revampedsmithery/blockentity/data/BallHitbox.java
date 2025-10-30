@@ -27,7 +27,7 @@ public class BallHitbox extends AbstractInteractionHitbox {
         super(box, debugColor);
         this.blockEntity = blockEntity;
         if (!this.blockEntity.getData().isArmorStackEmpty()) {
-            expandBoxWithArmorStack();
+            expandBox();
         }
     }
 
@@ -55,13 +55,13 @@ public class BallHitbox extends AbstractInteractionHitbox {
                     player.getMainHandStack().decrement(1);
                 }
             }
-            expandBoxWithArmorStack();
+            this.expandBox();
         } else if (handStack.isEmpty() && !data.isArmorStackEmpty()) {
             if (isServer) {
                 player.getInventory().offerOrDrop(armorStack.copy());
                 data.setArmorStack(ItemStack.EMPTY);
             }
-            resetBoxWithoutArmorStack();
+            this.resetBox();
         } else {
             return ActionResult.PASS;
         }
@@ -103,12 +103,12 @@ public class BallHitbox extends AbstractInteractionHitbox {
         return ActionResult.SUCCESS;
     }
 
-    public void expandBoxWithArmorStack() {
+    public void expandBox() {
         if (!this.box.equals(this.getOriginalBox())) return;
         this.box = this.box.expand(HITBOX_SIZE_CHANGE, HITBOX_SIZE_CHANGE, HITBOX_SIZE_CHANGE);
     }
 
-    public void resetBoxWithoutArmorStack() {
+    public void resetBox() {
         this.box = this.getOriginalBox();
     }
 }

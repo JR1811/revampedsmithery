@@ -203,7 +203,7 @@ public class SmithStationDataComponent implements Component, AutoSyncedComponent
         if (this.inInitializeProcess) {
             for (var entry : getBlockEntity().getHitBoxes().values()) {
                 if (entry instanceof BallHitbox ballHitbox && !isArmorStackEmpty()) {
-                    ballHitbox.expandBoxWithArmorStack();
+                    ballHitbox.expandBox();
                     break;
                 }
             }
