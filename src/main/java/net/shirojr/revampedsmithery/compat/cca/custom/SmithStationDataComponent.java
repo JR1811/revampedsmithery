@@ -12,6 +12,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.shirojr.revampedsmithery.RevampedSmithery;
 import net.shirojr.revampedsmithery.blockentity.SmithStationBlockEntity;
+import net.shirojr.revampedsmithery.blockentity.data.BallHitbox;
 import net.shirojr.revampedsmithery.compat.cca.RevampedSmitheryComponents;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -39,6 +40,8 @@ public class SmithStationDataComponent implements Component, AutoSyncedComponent
     private boolean isArmorXAxisPositive;
     private boolean isArmorYAxisPositive;
 
+    private boolean inInitializeProcess;
+
     public SmithStationDataComponent(SmithStationBlockEntity blockEntity) {
         this.blockEntity = blockEntity;
         this.fuelStack = ItemStack.EMPTY;
@@ -50,6 +53,7 @@ public class SmithStationDataComponent implements Component, AutoSyncedComponent
         this.lit = false;
         this.isArmorXAxisPositive = true;
         this.isArmorYAxisPositive = true;
+        this.inInitializeProcess = true;
     }
 
     @Nullable
@@ -195,6 +199,16 @@ public class SmithStationDataComponent implements Component, AutoSyncedComponent
         this.armorHitTickCooldown = !nbtCompound.contains("armorCooldown") ? 0 : nbtCompound.getInt("armorCooldown");
         this.isArmorXAxisPositive = !nbtCompound.contains("armorXAxis") || nbtCompound.getBoolean("armorXAxis");
         this.isArmorYAxisPositive = !nbtCompound.contains("armorYAxis") || nbtCompound.getBoolean("armorYAxis");
+
+        if (this.inInitializeProcess) {
+            for (var entry : getBlockEntity().getHitBoxes().values()) {
+                if (entry instanceof BallHitbox ballHitbox && !isArmorStackEmpty()) {
+                    ballHitbox.expandBoxWithArmorStack();
+                    break;
+                }
+            }
+            this.inInitializeProcess = false;
+        }
     }
 
     @Override

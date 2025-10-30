@@ -12,7 +12,6 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.shirojr.revampedsmithery.RevampedSmithery;
 import net.shirojr.revampedsmithery.block.SmithStationBlock;
 import net.shirojr.revampedsmithery.blockentity.data.*;
 import net.shirojr.revampedsmithery.compat.cca.custom.SmithStationDataComponent;
@@ -20,7 +19,6 @@ import net.shirojr.revampedsmithery.init.RevampedSmitheryBlockEntities;
 import net.shirojr.revampedsmithery.init.RevampedSmitheryBlocks;
 import net.shirojr.revampedsmithery.util.ShapeUtil;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3f;
 
 import java.util.HashMap;
 import java.util.Optional;
@@ -39,63 +37,64 @@ public class SmithStationBlockEntity extends BlockEntity {
 
     private void initializeInnerHitboxes() {
         this.hitBoxes.put(
-                RevampedSmithery.getId("bucket"),
+                BucketHitbox.IDENTIFIER,
                 new BucketHitbox(
                         ShapeUtil.getBoxFromVoxelCoordinates(
                                 new Vec3d(10, 0, 3),
                                 new Vec3d(15, 5, 8)
                         ),
-                        new Vector3f(0.7f, 0.1f, 0.3f)
+                        AbstractInteractionHitbox.RED
                 )
         );
         this.hitBoxes.put(
-                RevampedSmithery.getId("pedal"),
+                PedalHitbox.IDENTIFIER,
                 new PedalHitbox(
                         ShapeUtil.getBoxFromVoxelCoordinates(
                                 new Vec3d(3, 0, 3),
                                 new Vec3d(7, 5, 15)
                         ),
-                        new Vector3f(0.7f, 0.1f, 0.3f)
+                        AbstractInteractionHitbox.RED
                 )
         );
         this.hitBoxes.put(
-                RevampedSmithery.getId("ball"),
+                BallHitbox.IDENTIFIER,
                 new BallHitbox(
+                        this,
                         ShapeUtil.getBoxFromVoxelCoordinates(
                                 new Vec3d(26, 15, 0),
                                 new Vec3d(30, 19, 4)
                         ),
-                        new Vector3f(0.7f, 0.1f, 0.3f)
+                        AbstractInteractionHitbox.RED
                 )
         );
         this.hitBoxes.put(
-                RevampedSmithery.getId("coal"),
+                CoalHitbox.IDENTIFIER,
                 new CoalHitbox(
                         ShapeUtil.getBoxFromVoxelCoordinates(
                                 new Vec3d(3, 16, 3),
                                 new Vec3d(13, 27, 15)
                         ),
-                        new Vector3f(0.7f, 0.1f, 0.3f)
+                        AbstractInteractionHitbox.RED
                 )
         );
         this.hitBoxes.put(
-                RevampedSmithery.getId("rasp_file"),
+                RaspFileHitbox.IDENTIFIER,
                 new RaspFileHitbox(
                         ShapeUtil.getBoxFromVoxelCoordinates(
                                 new Vec3d(15, 14, 10),
                                 new Vec3d(21, 20, 14)
                         ),
-                        new Vector3f(0.7f, 0.1f, 0.3f)
+                        AbstractInteractionHitbox.RED
                 )
         );
         this.hitBoxes.put(
-                RevampedSmithery.getId("clamp"),
+                ClampHitbox.IDENTIFIER,
                 new ClampHitbox(
                         ShapeUtil.getBoxFromVoxelCoordinates(
                                 new Vec3d(15, 15, 5),
                                 new Vec3d(23, 19, 8)
                         ),
-                        new Vector3f(0.7f, 0.1f, 0.3f)
+                        AbstractInteractionHitbox.RED
                 )
         );
     }
