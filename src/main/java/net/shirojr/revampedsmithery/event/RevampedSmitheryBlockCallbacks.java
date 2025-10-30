@@ -10,6 +10,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.shirojr.revampedsmithery.block.SmithStationBlock;
 import net.shirojr.revampedsmithery.blockentity.SmithStationBlockEntity;
+import net.shirojr.revampedsmithery.blockentity.data.AbstractInteractionHitbox;
 import net.shirojr.revampedsmithery.init.RevampedSmitheryBlocks;
 
 public class RevampedSmitheryBlockCallbacks implements AttackBlockCallback {
@@ -21,11 +22,9 @@ public class RevampedSmitheryBlockCallbacks implements AttackBlockCallback {
             BlockPos originPos = state.get(SmithStationBlock.PART).getPosOfOrigin(blockPos, facing);
             SmithStationBlockEntity blockEntity = SmithStationBlock.getBlockEntity(world, originPos);
             if (blockEntity == null) return ActionResult.PASS;
-            SmithStationBlockEntity.InteractionHitBox targetedHitbox = blockEntity.getTargetedHitbox(playerEntity);
+            AbstractInteractionHitbox targetedHitbox = blockEntity.getTargetedHitbox(playerEntity);
             if (targetedHitbox == null) return ActionResult.PASS;
-            if (targetedHitbox.equals(SmithStationBlockEntity.InteractionHitBox.BALL)) {
-                return targetedHitbox.interact(blockEntity, blockPos, playerEntity, playerEntity.getStackInHand(hand), true);
-            }
+            return targetedHitbox.attack(blockEntity, blockPos, playerEntity, playerEntity.getStackInHand(hand));
         }
         return ActionResult.PASS;
     }

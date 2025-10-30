@@ -16,12 +16,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.RotationAxis;
+import net.minecraft.util.math.random.Random;
 import net.shirojr.revampedsmithery.RevampedSmithery;
 import net.shirojr.revampedsmithery.block.SmithStationBlock;
 import net.shirojr.revampedsmithery.blockentity.SmithStationBlockEntity;
+import net.shirojr.revampedsmithery.compat.cca.custom.SmithStationDataComponent;
 import net.shirojr.revampedsmithery.init.RevampedSmitheryBlocks;
 import net.shirojr.revampedsmithery.init.RevampedSmitheryModelLayers;
 import net.shirojr.revampedsmithery.mixin.access.DebugRendererAccess;
+import net.shirojr.revampedsmithery.util.AnimationUtil;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
@@ -73,7 +76,7 @@ public class SmithStationRenderer implements BlockEntityRenderer<SmithStationBlo
         this.baseModel.render(matrices, vertexConsumer, blockLight, overlay, 1f, 1f, 1f, 1f);
 
         if (armorStack.getItem() instanceof ArmorItem armorItem) {
-            this.renderArmor(matrices, vertexConsumers, blockLight, armorStack, armorItem, armorItem.getSlotType());
+            this.renderArmor(entity, matrices, vertexConsumers, blockLight, tickDelta, armorStack, armorItem, armorItem.getSlotType(), client.world.getRandom());
         }
         matrices.pop();
     }
@@ -82,25 +85,36 @@ public class SmithStationRenderer implements BlockEntityRenderer<SmithStationBlo
         BlockState state = entity.getCachedState();
         if (!state.isOf(RevampedSmitheryBlocks.SMITH_STATION)) return;
         Direction facing = state.get(SmithStationBlock.FACING);
-        entity.getHitBoxes().forEach((hitBox) -> {
+        entity.getHitBoxes().forEach((identifier, hitBox) -> {
             Vector3f color = hitBox.getDebugColor();
             WorldRenderer.drawBox(matrices, vertexConsumers.getBuffer(RenderLayer.LINES), hitBox.getRotatedBox(facing),
                     color.x, color.y, color.z, 1f);
         });
     }
 
-    private void renderArmor(MatrixStack matrices, VertexConsumerProvider vertexConsumers,
-                             int light, ItemStack stack, ArmorItem armorItem,
-                             EquipmentSlot slot) {
+    private void renderArmor(SmithStationBlockEntity entity, MatrixStack matrices, VertexConsumerProvider vertexConsumers,
+                             int light, float tickDelta, ItemStack stack, ArmorItem armorItem,
+                             EquipmentSlot slot, Random random) {
         float scale = 0.85f;
         boolean useInnerLayer = slot == EquipmentSlot.LEGS;
         ArmorStandArmorEntityModel armorModel = useInnerLayer ? innerArmorModel : outerArmorModel;
 
-        matrices.push();
-
         armorModel.setVisible(false);
         armorModel.child = false;
         armorModel.sneaking = false;
+
+        matrices.push();
+
+        if (entity.getData().isArmorHitTickCoolingDown()) {
+            float cooldown = entity.getData().getArmorHitTickCooldown() - tickDelta;
+            float maxCooldown = SmithStationDataComponent.ARMOR_BALL_HIT_TICK_COOLDOWN;
+            matrices.translate(1.2, 0.2, 0.4);
+            RotationAxis xAxis = entity.getData().isArmorXAxisPositive() ? RotationAxis.POSITIVE_X : RotationAxis.NEGATIVE_X;
+            RotationAxis yAxis = entity.getData().isArmorYAxisPositive() ? RotationAxis.POSITIVE_Y : RotationAxis.NEGATIVE_Y;
+            matrices.multiply(xAxis.rotationDegrees(AnimationUtil.getPunchInterpolation(cooldown, maxCooldown) * 15));
+            matrices.multiply(yAxis.rotationDegrees(AnimationUtil.getPunchInterpolation(cooldown, maxCooldown) * 15));
+            matrices.translate(-1.2, -0.2, -0.4);
+        }
 
         switch (slot) {
             case HEAD -> {
