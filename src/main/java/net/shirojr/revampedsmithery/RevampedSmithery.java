@@ -3,10 +3,7 @@ package net.shirojr.revampedsmithery;
 import net.fabricmc.api.ModInitializer;
 
 import net.minecraft.util.Identifier;
-import net.shirojr.revampedsmithery.init.RevampedSmitheryBlockEntities;
-import net.shirojr.revampedsmithery.init.RevampedSmitheryBlocks;
-import net.shirojr.revampedsmithery.init.RevampedSmitheryEvents;
-import net.shirojr.revampedsmithery.init.RevampedSmitheryItems;
+import net.shirojr.revampedsmithery.init.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +17,7 @@ public class RevampedSmithery implements ModInitializer {
 		RevampedSmitheryBlocks.initialize();
 		RevampedSmitheryBlockEntities.initialize();
 		RevampedSmitheryEvents.initializeCommon();
+		RevampedSmitherySounds.initialize();
 
 		LOGGER.info("Time to light up the furnace!");
 	}

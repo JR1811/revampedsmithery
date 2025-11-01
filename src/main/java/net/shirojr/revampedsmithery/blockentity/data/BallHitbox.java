@@ -8,8 +8,12 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.shirojr.revampedsmithery.RevampedSmithery;
 import net.shirojr.revampedsmithery.block.SmithStationBlock;
@@ -42,20 +46,24 @@ public class BallHitbox extends AbstractInteractionHitbox {
     }
 
     @Override
-    public ActionResult interact(SmithStationBlockEntity blockEntity, BlockPos actualPos, PlayerEntity player, ItemStack stack) {
+    public ActionResult interact(SmithStationBlockEntity blockEntity, Vec3d actualPos, PlayerEntity player, Hand hand) {
         boolean isServer = player.getWorld() instanceof ServerWorld;
         SmithStationDataComponent data = blockEntity.getData();
         ItemStack handStack = player.getMainHandStack();
         ItemStack armorStack = data.getArmorStack();
 
-        if (handStack.getItem() instanceof ArmorItem && data.isArmorStackEmpty()) {
-            if (isServer) {
-                data.setArmorStack(handStack.copyWithCount(1));
-                if (!player.isCreative()) {
-                    player.getMainHandStack().decrement(1);
+        if (handStack.getItem() instanceof ArmorItem) {
+            if (data.isArmorStackEmpty()) {
+                if (isServer) {
+                    data.setArmorStack(handStack.copyWithCount(1));
+                    if (!player.isCreative()) {
+                        player.getMainHandStack().decrement(1);
+                    }
                 }
+                this.expandBox();
+                return ActionResult.SUCCESS;
             }
-            this.expandBox();
+            return ActionResult.FAIL;
         } else if (handStack.isEmpty() && !data.isArmorStackEmpty()) {
             if (isServer) {
                 player.getInventory().offerOrDrop(armorStack.copy());
@@ -67,7 +75,7 @@ public class BallHitbox extends AbstractInteractionHitbox {
         }
         if (player.getWorld() instanceof ServerWorld serverWorld) {
             float pitch = MathHelper.lerp(serverWorld.getRandom().nextFloat(), 0.7f, 0.8f);
-            serverWorld.playSound(null, actualPos, SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, SoundCategory.BLOCKS, 1f, pitch);
+            serverWorld.playSound(null, actualPos.x, actualPos.y, actualPos.z, SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, SoundCategory.BLOCKS, 1f, pitch);
         }
         RevampedSmithery.LOGGER.info(armorStack.toString());
         RevampedSmithery.LOGGER.info("Interacted with Ball");
@@ -75,7 +83,7 @@ public class BallHitbox extends AbstractInteractionHitbox {
     }
 
     @Override
-    public ActionResult attack(SmithStationBlockEntity blockEntity, BlockPos actualPos, PlayerEntity player, ItemStack stack) {
+    public ActionResult attack(SmithStationBlockEntity blockEntity, Vec3d actualPos, PlayerEntity player, ItemStack stack) {
         boolean isServer = player.getWorld() instanceof ServerWorld;
         SmithStationDataComponent data = blockEntity.getData();
         ItemStack armorStack = data.getArmorStack();
@@ -87,8 +95,8 @@ public class BallHitbox extends AbstractInteractionHitbox {
             if (player.getWorld() instanceof ServerWorld serverWorld) {
                 Random random = serverWorld.getRandom();
                 float pitch = MathHelper.lerp(random.nextFloat(), 0.7f, 1f);
-                serverWorld.playSound(null, actualPos, SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.BLOCKS, 1f, pitch);
-                serverWorld.playSound(null, actualPos, SoundEvents.BLOCK_LANTERN_BREAK, SoundCategory.BLOCKS, 1f, pitch);
+                serverWorld.playSound(null, actualPos.x, actualPos.y, actualPos.z, SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.BLOCKS, 1f, pitch);
+                serverWorld.playSound(null, actualPos.x, actualPos.y, actualPos.z, SoundEvents.BLOCK_LANTERN_BREAK, SoundCategory.BLOCKS, 1f, pitch);
                 Vec3d hitboxCenter = getRotatedBox(facing).offset(blockEntity.getPos()).getCenter();
                 serverWorld.spawnParticles(
                         ParticleTypes.CRIT,

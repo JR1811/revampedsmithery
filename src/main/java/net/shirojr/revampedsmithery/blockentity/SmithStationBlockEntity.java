@@ -3,12 +3,11 @@ package net.shirojr.revampedsmithery.blockentity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -39,6 +38,7 @@ public class SmithStationBlockEntity extends BlockEntity {
         this.hitBoxes.put(
                 BucketHitbox.IDENTIFIER,
                 new BucketHitbox(
+                        this,
                         ShapeUtil.getBoxFromVoxelCoordinates(
                                 new Vec3d(10, 0, 3),
                                 new Vec3d(15, 5, 8)
@@ -103,17 +103,19 @@ public class SmithStationBlockEntity extends BlockEntity {
         return SmithStationDataComponent.get(this);
     }
 
-    public ActionResult attemptInteraction(ItemStack stack, PlayerEntity player, BlockHitResult hit) {
+    public ActionResult attemptInteraction(PlayerEntity player, Hand hand) {
         BlockState state = this.getCachedState();
         if (!state.isOf(RevampedSmitheryBlocks.SMITH_STATION)) return ActionResult.FAIL;
-        AbstractInteractionHitbox targetedHitbox = getTargetedHitbox(player);
+        Pair<AbstractInteractionHitbox, Vec3d> targetedHitbox = getTargetedHitbox(player);
         if (targetedHitbox == null) return ActionResult.PASS;
-        return targetedHitbox.interact(this, hit.getBlockPos(), player, stack);
+        return targetedHitbox.getLeft().interact(this, targetedHitbox.getRight(), player, hand);
     }
 
     @Nullable
-    public AbstractInteractionHitbox getTargetedHitbox(PlayerEntity player) {
-        Pair<AbstractInteractionHitbox, Double> closestInteraction = null;
+    public Pair<AbstractInteractionHitbox, Vec3d> getTargetedHitbox(PlayerEntity player) {
+        double distance = -1;
+        AbstractInteractionHitbox closestInteraction = null;
+        Vec3d closestInteractionHitPos = null;
 
         double reachDistance = player.isCreative() ? 5.0 : 4.5;
         Vec3d eyePos = player.getEyePos();
@@ -124,12 +126,15 @@ public class SmithStationBlockEntity extends BlockEntity {
         for (var hitBox : this.getHitBoxes().values()) {
             Optional<Vec3d> raycast = hitBox.getRotatedBox(facing).offset(this.pos).raycast(eyePos, endPos);
             if (raycast.isEmpty()) continue;
-            double currentDistance = eyePos.squaredDistanceTo(raycast.get());
-            if (closestInteraction == null || closestInteraction.getRight() > currentDistance) {
-                closestInteraction = new Pair<>(hitBox, currentDistance);
+            Vec3d successfulRaycast = raycast.get();
+            double currentDistance = eyePos.squaredDistanceTo(successfulRaycast);
+            if (closestInteraction == null || distance > currentDistance) {
+                closestInteraction = hitBox;
+                distance = currentDistance;
+                closestInteractionHitPos = successfulRaycast;
             }
         }
-        return closestInteraction == null ? null : closestInteraction.getLeft();
+        return closestInteraction == null ? null : new Pair<>(closestInteraction, closestInteractionHitPos);
     }
 
     /**

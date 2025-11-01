@@ -4,15 +4,17 @@ import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
 import net.shirojr.revampedsmithery.RevampedSmithery;
 import net.shirojr.revampedsmithery.blockentity.SmithStationBlockEntity;
 import org.joml.Vector3f;
 
 public class CoalHitbox extends AbstractInteractionHitbox {
     public static final Identifier IDENTIFIER = RevampedSmithery.getId("coal");
+    public static final String HEAT_ITEM_STACK_NBT_KEY = "heat";
 
     public CoalHitbox(Box box, Vector3f debugColor) {
         super(box, debugColor);
@@ -24,8 +26,8 @@ public class CoalHitbox extends AbstractInteractionHitbox {
     }
 
     @Override
-    public ActionResult interact(SmithStationBlockEntity blockEntity, BlockPos actualPos, PlayerEntity player, ItemStack stack) {
-        RevampedSmithery.LOGGER.info("Used Coal Furnace");
+    public ActionResult interact(SmithStationBlockEntity blockEntity, Vec3d actualPos, PlayerEntity player, Hand hand) {
+        ItemStack stack = player.getStackInHand(hand);
         ItemStack furnaceStack = blockEntity.getData().getFuelStack();
         int insertionAmount = 1;
         ItemStack toBeInsertedStack = stack.copyWithCount(insertionAmount);

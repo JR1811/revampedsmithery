@@ -5,7 +5,9 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
 import net.minecraft.registry.DefaultedRegistry;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
+import net.shirojr.revampedsmithery.init.RevampedSmitheryBlocks;
 import net.shirojr.revampedsmithery.init.RevampedSmitheryItems;
+import net.shirojr.revampedsmithery.init.RevampedSmitherySounds;
 
 import java.util.Locale;
 
@@ -17,6 +19,8 @@ public class RevampedSmitheryTranslationGenerator extends FabricLanguageProvider
     @Override
     public void generateTranslations(TranslationBuilder builder) {
         builder.add(RevampedSmitheryItems.HAMMER, getClean(getId(Registries.ITEM, RevampedSmitheryItems.HAMMER)));
+        builder.add(RevampedSmitheryBlocks.SMITH_STATION, "Smith Station");
+        builder.add(RevampedSmitherySounds.RASP_FILE.getLeft(), getClean(RevampedSmitherySounds.RASP_FILE.getLeft()));
     }
 
     private String getClean(Identifier identifier) {

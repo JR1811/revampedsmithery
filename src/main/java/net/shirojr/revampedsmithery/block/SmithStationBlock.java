@@ -131,7 +131,7 @@ public class SmithStationBlock extends BlockWithEntity {
         SmithStationBlockEntity blockEntity = getBlockEntity(world, pos);
         if (blockEntity == null) return ActionResult.PASS;
         ItemStack stack = player.getStackInHand(hand);
-        return blockEntity.attemptInteraction(stack, player, hit);
+        return blockEntity.attemptInteraction(player, hand);
     }
 
     @Override

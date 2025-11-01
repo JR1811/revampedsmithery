@@ -1,3 +1,5 @@
 {
-  "item.revampedsmithery.hammer": "Hammer"
+  "block.revampedsmithery.smith_station": "Smith Station",
+  "item.revampedsmithery.hammer": "Hammer",
+  "revampedsmithery.rasp_file": "RaspFile"
 }

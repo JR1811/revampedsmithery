@@ -1,0 +1,64 @@
+{
+  "variants": {
+    "facing=east,smith_station_part=clamps": {
+      "model": "revampedsmithery:smith_station_clamps",
+      "y": 90
+    },
+    "facing=east,smith_station_part=fences": {
+      "model": "revampedsmithery:smith_station_fences",
+      "y": 90
+    },
+    "facing=east,smith_station_part=furnace": {
+      "model": "revampedsmithery:smith_station_furnace",
+      "y": 90
+    },
+    "facing=east,smith_station_part=pedal": {
+      "model": "revampedsmithery:smith_station_pedal",
+      "y": 90
+    },
+    "facing=north,smith_station_part=clamps": {
+      "model": "revampedsmithery:smith_station_clamps"
+    },
+    "facing=north,smith_station_part=fences": {
+      "model": "revampedsmithery:smith_station_fences"
+    },
+    "facing=north,smith_station_part=furnace": {
+      "model": "revampedsmithery:smith_station_furnace"
+    },
+    "facing=north,smith_station_part=pedal": {
+      "model": "revampedsmithery:smith_station_pedal"
+    },
+    "facing=south,smith_station_part=clamps": {
+      "model": "revampedsmithery:smith_station_clamps",
+      "y": 180
+    },
+    "facing=south,smith_station_part=fences": {
+      "model": "revampedsmithery:smith_station_fences",
+      "y": 180
+    },
+    "facing=south,smith_station_part=furnace": {
+      "model": "revampedsmithery:smith_station_furnace",
+      "y": 180
+    },
+    "facing=south,smith_station_part=pedal": {
+      "model": "revampedsmithery:smith_station_pedal",
+      "y": 180
+    },
+    "facing=west,smith_station_part=clamps": {
+      "model": "revampedsmithery:smith_station_clamps",
+      "y": 270
+    },
+    "facing=west,smith_station_part=fences": {
+      "model": "revampedsmithery:smith_station_fences",
+      "y": 270
+    },
+    "facing=west,smith_station_part=furnace": {
+      "model": "revampedsmithery:smith_station_furnace",
+      "y": 270
+    },
+    "facing=west,smith_station_part=pedal": {
+      "model": "revampedsmithery:smith_station_pedal",
+      "y": 270
+    }
+  }
+}

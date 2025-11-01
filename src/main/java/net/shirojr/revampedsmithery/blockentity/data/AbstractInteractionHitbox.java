@@ -3,10 +3,11 @@ package net.shirojr.revampedsmithery.blockentity.data;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.shirojr.revampedsmithery.blockentity.SmithStationBlockEntity;
 import net.shirojr.revampedsmithery.util.ShapeUtil;
 import org.joml.Vector3f;
@@ -49,11 +50,11 @@ public abstract class AbstractInteractionHitbox {
         return debugColor;
     }
 
-    public ActionResult interact(SmithStationBlockEntity blockEntity, BlockPos actualPos, PlayerEntity player, ItemStack stack) {
+    public ActionResult interact(SmithStationBlockEntity blockEntity, Vec3d actualPos, PlayerEntity player, Hand hand) {
         return ActionResult.PASS;
     }
 
-    public ActionResult attack(SmithStationBlockEntity blockEntity, BlockPos actualPos, PlayerEntity player, ItemStack stack) {
+    public ActionResult attack(SmithStationBlockEntity blockEntity, Vec3d actualPos, PlayerEntity player, ItemStack stack) {
         return ActionResult.PASS;
     }
 }
